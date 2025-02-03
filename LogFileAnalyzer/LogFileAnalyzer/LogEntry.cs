@@ -10,7 +10,10 @@ namespace LogFileAnalyzer
     {
         //properties: Timestamp; Level; Message; Id (GUID)
         //methods: GetSeverityAndCount
-        public string Timestamp { get; set; } //using string for more flexibility and brevity - date not needed
+        public string IPAddress { get; set; }
+        public string Request { get; set; }
+        public int StatusCode { get; set; }
+        public DateTime Timestamp { get; set; } //update: date needed
         public string Level { get; set; }
         public string Message { get; set; }
         public string Id { get; set; }

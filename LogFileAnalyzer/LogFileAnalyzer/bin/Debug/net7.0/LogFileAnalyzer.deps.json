@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v7.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v7.0": {
+      "LogFileAnalyzer/1.0.0": {
+        "runtime": {
+          "LogFileAnalyzer.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LogFileAnalyzer/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
