@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LogFileAnalyzer
 {
-    internal class LogEntry
+    public class LogEntry
     {
         //properties: Timestamp; Level; Message; Id (GUID)
         //methods: GetSeverityAndCount

@@ -14,7 +14,7 @@ namespace LogFileAnalyzer
         //properties: Logs (List of LogEntry); ProcessingQueue (Queue of LogEntry)        
         //methods: Analyze (override); ReadLogsAsync; ProcessLogsParallel;ParseLogEntry; ApplyDynamicFilter; ManageMemory
         //public string Logs { get; set; }
-        public List<string> Logs { get; set; } = new List<string>();
+        private List<string> Logs { get; set; } = new List<string>();
         //public string ProcessingQueue { get; set;  }
         public ConcurrentQueue<string> ProcessingQueue { get; set; } = new ConcurrentQueue<string>();        
 
@@ -30,7 +30,7 @@ namespace LogFileAnalyzer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading logs: {ex.Message}");
+                throw new IOException($"Error reading logs from {filePath}: {ex.Message}", ex);
             }
         }
 
@@ -40,7 +40,7 @@ namespace LogFileAnalyzer
                 return null;
 
             var logEntry = new LogEntry();
-            string pattern = @"(?<ip>\d+\.\d+\.\d+\.\d+) - - \[(?<timestamp>.*?)\] ""(?<request>.*?)"" (?<status>\d+) (?<size>\d+|-)";
+            string pattern = @"(?<ip>\d+\.\d+\.\d+\.\d+) - - \[(?<timestamp>.*?)\] ""(?<request>.*?)"" (?<status>\d+) (?<size>\d+|-) (?<level>.*?)$";
 
             Match match = Regex.Match(logLine, pattern);
 
@@ -50,6 +50,7 @@ namespace LogFileAnalyzer
                 logEntry.Request = match.Groups["request"].Value;
                 logEntry.StatusCode = int.TryParse(match.Groups["status"].Value, out int status) ? status : 0;
                 logEntry.Timestamp = DateTime.TryParse(match.Groups["timestamp"].Value, out DateTime timestamp) ? timestamp : DateTime.MinValue;
+                logEntry.Level = match.Groups["level"].Value;
             }
 
             return logEntry;
@@ -59,15 +60,18 @@ namespace LogFileAnalyzer
         {
             var log = ParseLogEntry(logLine);
 
-            switch (log.Level)
+            if (log != null)
             {
-                case "Error":
-                    break;
-                case "Info":
-                    break;
-                default:
-                    break;
-            }
+                switch (log.Level)
+                {
+                    case "Error":
+                        break;
+                    case "Info":
+                        break;
+                    default:
+                        break;
+                }
+            }            
         }
 
         public async Task ProcessLogsParallel()
@@ -76,9 +80,64 @@ namespace LogFileAnalyzer
             await Task.WhenAll(tasks);
         }
 
+        private Tuple<DateTime, DateTime> CalculateTimeRange(List<LogEntry> logs)
+        {
+            if (logs == null || !logs.Any())
+            {
+                return new Tuple<DateTime, DateTime>(DateTime.MinValue, DateTime.MinValue);
+            }
+
+            var minTime = logs.Min(l => l.Timestamp);
+            var maxTime = logs.Max(l => l.Timestamp);
+
+            return new Tuple<DateTime, DateTime>(minTime, maxTime);
+        }
+
+        private Tuple<DateTime, DateTime> CalculateAverageResponseTime(List<LogEntry> logs)
+        {
+            if (logs == null || !logs.Any())
+            {
+                return new Tuple<DateTime, DateTime>(DateTime.MinValue, DateTime.MinValue);
+            }
+
+            var minTime = logs.Min(l => l.Timestamp);
+            var maxTime = logs.Max(l => l.Timestamp);
+
+            return new Tuple<DateTime, DateTime>(minTime, maxTime);
+        }
+
         public override void Analyze()
         {
-            
+            try
+            {
+                string filePath = LogPath;
+                //string filePath = "path/to/your/logfile.log";
+                ReadLogsAsync(filePath).Wait();
+
+                var logEntries = Logs.Select(ParseLogEntry).Where(l => l != null).ToList();
+                
+                ProcessLogsParallel().Wait();
+
+                string filterCriteria = "Level=Error";
+                var filter = ApplyDynamicFilter(filterCriteria);
+
+                //var logEntries = Logs.Select(ParseLogEntry).ToList();
+
+                var filteredLogs = logEntries.Where(filter).ToList();
+
+                int errorCount = filteredLogs.Count(log => log.Level == "Error");
+
+                var (minTime, maxTime) = CalculateTimeRange(filteredLogs);
+                var averageResponseTime = CalculateAverageResponseTime(filteredLogs);
+
+                Console.WriteLine($"Total errors found: {errorCount}");
+                Console.WriteLine($"Time range of logs: {minTime} to {maxTime}");
+                Console.WriteLine($"Average response time: {averageResponseTime}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred during analysis: {ex.Message}");
+            }
         }
 
         public Func<LogEntry, bool> ApplyDynamicFilter(string filterCriteria)
@@ -112,6 +171,29 @@ namespace LogFileAnalyzer
         public void ManageMemory()
         {
             //optimization logic
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            object boxedInt = 42;
+            if (boxedInt is int unboxedInt)
+            {
+                Console.WriteLine($"Unboxed: {unboxedInt}");
+            }
+
+            if (Logs != null && Logs.Count > 10000)
+            {
+                Logs.Clear();
+                Logs = null;
+                Logs = new List<string>();
+            }
+
+            using (var tempStream = new MemoryStream())
+            {
+
+            }
+
+            Console.WriteLine("Memory management tasks performed.");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace LogFileAnalyzer
     public class LogAnalyzerUI
     {
         //properties: analyzer(LogFileAnalyzer)
+        public string Analyzer { get; set; }
         //methods: StartAnalysis; DisplayResults; GetUserInput
 
         public void StartAnalysis()
@@ -19,6 +20,11 @@ namespace LogFileAnalyzer
         public void DisplayResults()
         {
             Console.WriteLine("Here's where the results will be displayed (work in progress).");
+        }
+
+        public void GetUserInput()
+        {
+
         }
     }
 }
