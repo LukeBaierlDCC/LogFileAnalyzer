@@ -16,8 +16,25 @@ namespace LogFileAnalyzer
         public DateTime Timestamp { get; set; } //update: date needed
         public string Level { get; set; }
         public string Message { get; set; }
-        public string Id { get; set; }
+        public Guid Id { get; private set; }
 
+        public LogEntry()
+        {
+            Id = Guid.NewGuid();
+        }
 
+        public (string Severity, int Count) GetSeverityAndCount()
+        {
+            string severity = Level switch
+            {
+                "ERROR" => "High",
+                "WARNING" => "Medium",
+                _ => "Low"
+            };
+
+            int count = 1;
+
+            return (severity, count);
+        }
     }
 }
