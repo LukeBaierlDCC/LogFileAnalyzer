@@ -24,7 +24,7 @@ namespace LogFileAnalyzer
 
         public void GetUserInput()
         {
-
+            //self-explanatory
         }
     }
 }
