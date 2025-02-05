@@ -40,9 +40,30 @@ namespace LogFileAnalyzer
             return (severity, count);
         }
 
-        public void ParseFromLogLine()
+        public void ParseFromLogLine(string logLine)
         {
             //used to parse log line string into properties of LogEntry...looking into RegEx or string manipulation
+            if (string.IsNullOrEmpty(logLine))
+            {
+                throw new ArgumentException("Log line cannot be null or empty.", nameof(logLine));
+            }
+
+            string[] parts = logLine.Split(' ');
+            if (parts.Length < 7)
+            {
+                throw new FormatException("Log line does not match the expected format.");
+            }
+
+            if (DateTime.TryParse(parts[0] + " " + parts[1], out DateTime dt))
+            {
+                Timestamp = dt;
+            }
+            else
+            {
+                //invalid date format handling will go here
+            }
+
+            //more logic for parsing and splitting currently under research
         }
 
         public void Equals()
