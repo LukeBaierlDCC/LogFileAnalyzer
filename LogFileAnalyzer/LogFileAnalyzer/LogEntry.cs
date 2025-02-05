@@ -68,6 +68,15 @@ namespace LogFileAnalyzer
             //parse and trim
             //parse out data
             //join message strings
+            Level = parts[2];
+            ThreadId = int.Parse(parts[3].Trim('[', ']'));
+            IPAddress = parts[4];
+            Request = parts[5];
+            StatusCode = int.TryParse(parts[7], out int status) ? status : -1;
+            Message = string.Join(" ", parts.Skip(8));
+            //source help https://stackoverflow.com/questions/54923764/parsing-string-data-in-c-net
+            //https://stackoverflow.com/questions/17903885/c-sharp-string-trimming
+            //https://learn.microsoft.com/en-us/dotnet/csharp/how-to/parse-strings-using-split (stackoverflow clarifies what MS docs generalizes)
         }
 
         public override string ToString()
