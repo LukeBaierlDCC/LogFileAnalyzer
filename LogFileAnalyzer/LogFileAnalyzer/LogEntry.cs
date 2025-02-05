@@ -64,51 +64,77 @@ namespace LogFileAnalyzer
             }
 
             //more logic for parsing and splitting currently under research
+            //separate by array data
+            //parse and trim
+            //parse out data
+            //join message strings
         }
 
-        public void Equals()
-        {
-            //may be needed for deduplication or comparison operations
-        }
-
-        public void ToString()
+        public override string ToString()
         {
             //provides a formatted string representation of log entry for display or logging
+            return $"{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level} [Thread-{ThreadId}] {IPAddress} {Request} - {StatusCode} {Message}";
         }
 
-        public void IsError()
+        public override bool Equals(object obj)
         {
-            //method returning a boolean indicating if this log entry represents an error
+            //may be needed for deduplication or comparison operations
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            LogEntry other = (LogEntry)obj;
+            return Id == other.Id &&
+                Timestamp == other.Timestamp &&
+                Level == other.Level &&
+                Message == other.Message &&
+                IPAddress == other.IPAddress &&
+                Request == other.Request &&
+                StatusCode == other.StatusCode &&
+                ThreadId == other.ThreadId &&
+                Source == other.Source &&
+                User == other.User;
         }
 
-        public void GetFormattedTimestamp()
-        {
-            //for returning the timestamp in a specific format, I am looking into CultureInfo
-        }
+        //public override int GetHashCode()
+        //{
+        //    //overrides support hash-based collections, potentially incorporating LINQ operations
 
-        public void CalculateTimeDifference()
+        //}
+
+        //public bool IsError()
+        //{
+        //    //method returning a boolean indicating if this log entry represents an error
+
+        //}
+
+        //public string GetFormattedTimestamp()
+        //{
+        //    //for returning the timestamp in a specific format, I am looking into CultureInfo
+
+        //}
+
+        public void CalculateTimeDifference(LogEntry otherEntry)
         {
             //computes the time difference from another Log Entry, looking into Math.Abs
+
         }
 
-        public void MatchesFilter()
-        {
-            //checks if this log entry matches specific criteria, useful for dynamic filtering. Incorporating lambda expressions for conditions.
-        }
+        //public bool MatchesFilter(Func<LogEntry, bool> filter)
+        //{
+        //    //checks if this log entry matches specific criteria, useful for dynamic filtering. Incorporating lambda expressions for conditions.
 
-        public void ToJson()
-        {
-            //serializes Log Entry, looking into JSON incorporation
-        }
+        //}
 
-        public void FromJson()
+        //public string ToJson()
+        //{
+        //    //serializes Log Entry, looking into JSON incorporation
+
+        //}
+
+        public void FromJson(string json)
         {
             //deserializes JSON string into object
-        }
 
-        public void GetHashCode()
-        {
-            //overrides support hash-based collections, potentially incorporating LINQ operations
         }
     }
 }
