@@ -18,6 +18,11 @@ namespace LogFileAnalyzer
         //public string ProcessingQueue { get; set;  }
         public ConcurrentQueue<string> ProcessingQueue { get; set; } = new ConcurrentQueue<string>();        
 
+        public LogFileAnalyzer(string logPath) : base(logPath)
+        {
+
+        }
+
         public async Task ReadLogsAsync(string filePath)
         {
             try
@@ -195,5 +200,10 @@ namespace LogFileAnalyzer
 
             Console.WriteLine("Memory management tasks performed.");
         }
+
+        //public override void SpecificAnalysis()
+        //{
+        //    throw new NotImplementedException("This method should be overridden in derived class.");
+        //}
     }
 }
