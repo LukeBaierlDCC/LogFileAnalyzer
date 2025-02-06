@@ -18,7 +18,7 @@ namespace LogFileAnalyzer
         public DateTime Timestamp { get; set; } //update: date needed
         public string Level { get; set; }
         public string Message { get; set; }
-        public Guid Id { get; private set; }
+        public Guid Id { get; set; }
         public string Source { get; set; }
         public string User { get; set; }
         public int ThreadId { get; set; }

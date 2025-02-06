@@ -34,16 +34,69 @@ namespace LogFileAnalyzer
             Config = new Dictionary<string, string>();
         }               
 
-        public virtual async Task ReadLogs()
+        public virtual void ReadLogs()
         {
             //reads the logs from the source
+            if (string.IsNullOrEmpty(this.LogPath))
+            {
+                throw new InvalidOperationException("LogPath cannot be null or empty.");
+            }
 
+            try
+            {
+                using (StreamReader sr = new StreamReader(this.LogPath))
+                {
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        LogEntry logEntry = this.ParseLogLine(line);
+                    }
+                }
+            }
+            catch (IOException ex)
+            {
+                throw new Exception("Error reading log file", ex);
+            }
         }
 
-        public virtual LogEntry ParseLogLine(string line)
+        protected virtual LogEntry ParseLogLine(string line)
         {
             //parses each line into log entry objects after reading logs
-            return new LogEntry();
+            if (string.IsNullOrEmpty(line))
+            {
+                return null;
+            }
+
+            string[] parts = line.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length < 4)
+            {
+                return null;
+            }
+
+            DateTime timestamp;
+            if (!DateTime.TryParse(parts[0] + " " + parts[1], out timestamp))
+            {
+                //handle parsing errors
+                return null;
+            }
+
+            //LogLevel level;
+            //if (!Enum.TryParse<LogLevel>(parts[2], true, out level))
+            //{
+            //    return null;
+            //}
+
+            string level = parts[2];
+            string message = string.Join(" ", parts.Skip(3));
+
+            return new LogEntry
+            {
+                Timestamp = timestamp,
+                Level = level,
+                Message = message,
+                Id = Guid.NewGuid()
+            };
         }
 
         public virtual void FilterLogs()
