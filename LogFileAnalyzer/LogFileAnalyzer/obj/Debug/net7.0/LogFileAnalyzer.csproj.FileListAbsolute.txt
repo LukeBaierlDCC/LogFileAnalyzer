@@ -13,3 +13,11 @@ F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFile
 F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\obj\Debug\net7.0\LogFileAnalyzer.pdb
 F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\obj\Debug\net7.0\LogFileAnalyzer.genruntimeconfig.cache
 F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\obj\Debug\net7.0\ref\LogFileAnalyzer.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.Logging.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Microsoft.Extensions.Primitives.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\bin\Debug\net7.0\Newtonsoft.Json.dll
+F:\2020 From The Desktop\CSharp Projects\LogFileAnalyzer\LogFileAnalyzer\LogFileAnalyzer\obj\Debug\net7.0\LogFileAnalyzer.csproj.CopyComplete

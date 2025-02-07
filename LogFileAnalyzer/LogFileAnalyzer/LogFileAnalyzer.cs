@@ -18,10 +18,10 @@ namespace LogFileAnalyzer
         //public string ProcessingQueue { get; set;  }
         public ConcurrentQueue<string> ProcessingQueue { get; set; } = new ConcurrentQueue<string>();
 
-        //public LogFileAnalyzer(string logPath) : base(logPath)  //preserving this as back-up method in case public BaseAnalyzer() : this(string.Empty) { } fails
-        //{
+        public LogFileAnalyzer(string logPath) : base(logPath)  //preserving this as back-up method in case public BaseAnalyzer() : this(string.Empty) { } fails
+        {
 
-        //}
+        }
 
         public async Task ReadLogsAsync(string filePath)
         {
