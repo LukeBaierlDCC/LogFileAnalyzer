@@ -9,7 +9,7 @@ namespace LogFileAnalyzer
     public class LogAnalyzerUI
     {
         //properties: analyzer(LogFileAnalyzer)
-        public string Analyzer { get; set; }
+        public LogFileAnalyzer Analyzer { get; set; }
         //methods: StartAnalysis; DisplayResults; GetUserInput
 
         public void StartAnalysis()

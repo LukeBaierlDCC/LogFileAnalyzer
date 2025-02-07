@@ -16,7 +16,7 @@ namespace LogFileAnalyzer
         Debug
     }
 
-    public class BaseAnalyzer
+    public class BaseAnalyzer : IDisposable
     {
         public string LogPath { get; private set; } //this is a Read-Only after initialization by using the private set
         public string OutputPath { get; set; }
@@ -192,13 +192,29 @@ namespace LogFileAnalyzer
         public virtual void Dispose()
         {
             //ensures all resources are managed accordingly post-analysis
-
+            this.logs.Clear();
         }
 
         public void ValidateConfig()
         {
             //validates the config if applicable
+            if (Config == null)
+            {
+                throw new InvalidOperationException("Configuration dictionary is null.");
+            }
 
+            if (!Config.ContainsKey("logLevel") || !Enum.TryParse<LogLevel>(Config["logLevel"], true, out _))
+            {
+                throw new ArgumentException("Invalid or missing logLevel in configuration.");
+            }
+
+            if (!Config.ContainsKey("outputPath") || string.IsNullOrWhiteSpace(Config["outputPath"]))
+            {
+                throw new ArgumentException("Invalid or missing outputPath in configuration.");
+            }
+
+            OutputPath = Config["outputPath"];
+            LogLevel = Enum.Parse<LogLevel>(Config["logLevel"], true);
         }
 
         public virtual void Analyze()
