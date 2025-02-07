@@ -147,30 +147,82 @@ namespace LogFileAnalyzer
 
         public Func<LogEntry, bool> ApplyDynamicFilter(string filterCriteria)
         {
-            string[] parts = filterCriteria.Split('=');
+            //string[] parts = filterCriteria.Split('=');
+            //if (parts.Length != 2)
+            //{
+            //    throw new ArgumentException("Invalid filter criteria format", nameof(filterCriteria));
+            //}
+
+            //string propertyName = parts[0].Trim();
+            //string value = parts[1].Trim();
+
+            //var parameter = Expression.Parameter(typeof(LogEntry), "log");
+
+            //if (propertyName == "Level")
+            //{
+            //    var property = Expression.Property(parameter, propertyName);
+            //    var constant = Expression.Constant(value);
+            //    var body = Expression.Equal(property, constant);
+
+            //    var lambda = Expression.Lambda<Func<LogEntry, bool>>(body, parameter);
+            //    return lambda.Compile();
+            //}
+            //else
+            //{
+            //    throw new NotSupportedException($"Filtering by {propertyName} is not supported.");
+            //}
+
+            var criteria = filterCriteria.Split(new[] { "AND", "OR" }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.Trim())
+                .ToArray();
+
+            Func<LogEntry, bool>[] filters = criteria.Select(BuildFilter).ToArray();
+
+            return entry => filters.Aggregate(true, (current, filter) => current && filter(entry));
+        }
+
+        private Func<LogEntry, bool> BuildFilter(string singleCriteria)
+        {
+            string[] parts = singleCriteria.Split('=');
             if (parts.Length != 2)
             {
-                throw new ArgumentException("Invalid filter criteria format", nameof(filterCriteria));
+                throw new ArgumentException("Invalid filter criteria format", nameof(singleCriteria));
             }
 
             string propertyName = parts[0].Trim();
             string value = parts[1].Trim();
 
             var parameter = Expression.Parameter(typeof(LogEntry), "log");
+            var property = Expression.Property(parameter, propertyName);
 
-            if (propertyName == "Level")
+            var propertyType = typeof(LogEntry).GetProperty(propertyName).PropertyType;
+
+            object parsedValue;
+            if (propertyType == typeof(string))
             {
-                var property = Expression.Property(parameter, propertyName);
-                var constant = Expression.Constant(value);
-                var body = Expression.Equal(property, constant);
-
-                var lambda = Expression.Lambda<Func<LogEntry, bool>>(body, parameter);
-                return lambda.Compile();
+                parsedValue = value;
+            }
+            else if (propertyType == typeof(int))
+            {
+                if (!int.TryParse(value, out int intValue))
+                    throw new ArgumentException($"Failed to parse '{value}' to int for property '{propertyName}'");
+                parsedValue = intValue;
+            }
+            else if (propertyType == typeof(DateTime))
+            {
+                if (!DateTime.TryParse(value, out DateTime dateTimeValue))
+                    throw new ArgumentException($"Failed to parse '{value}' to int for property '{propertyName}'");
+                parsedValue = dateTimeValue;
             }
             else
             {
-                throw new NotSupportedException($"Filtering by {propertyName} is not supported.");
+                throw new NotSupportedException($"Filtering by property type {propertyType.Name} is not supported.");
             }
+
+            var constant = Expression.Constant(parsedValue, propertyType);
+            var body = Expression.Equal(property, constant);
+
+            return Expression.Lambda<Func<LogEntry, bool>>(body, parameter).Compile();
         }
 
         public void ManageMemory()
