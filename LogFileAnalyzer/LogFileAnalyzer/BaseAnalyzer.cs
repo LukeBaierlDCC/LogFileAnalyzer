@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -121,7 +122,7 @@ namespace LogFileAnalyzer
 
         protected virtual void SpecificFilterLogs(List<LogEntry> logs)
         {
-            //
+            //override in derived classes for custom processing logic
         }
 
         public virtual void ProcessLogs(List<LogEntry> logs)
@@ -146,13 +147,46 @@ namespace LogFileAnalyzer
         {
             //creates a summary or detailed report
             LastAnalysisTime = DateTime.Now;
-            return "";
+
+            var logLevelCounts = logs.GroupBy(log => log.Level).ToDictionary(g => g.Key, g => g.Count());
+
+            int errorCount = logLevelCounts.TryGetValue("Error", out int errors) ? errors : 0;
+            int warningCount = logLevelCounts.TryGetValue("Warning", out int warnings) ? warnings : 0;
+
+            string timeRange = logs.Any()
+                ? $"from {logs.Min(l => l.Timestamp)} to {logs.Max(l => l.Timestamp)}"
+                : "No logs available";
+
+            StringBuilder report = new StringBuilder();
+            report.AppendLine($"Log Analysis Report as of {LastAnalysisTime}");
+            report.AppendLine($"Time Range: {timeRange}");
+            report.AppendLine($"Total Errors: {errorCount}");
+            report.AppendLine($"Total Warnings: {warningCount}");
+            report.AppendLine("Log Level Distribution:");
+            foreach (var pair in logLevelCounts)
+            {
+                report.AppendLine($"- {pair.Key}: {pair.Value}");
+            }
+
+            return report.ToString();
         }
 
         public void SaveReport(string report)
         {
             //saves report to file for output
-
+            if (string.IsNullOrEmpty(OutputPath))
+            {
+                throw new InvalidOperationException("OutputPath has not been set.");
+            }
+            try
+            {
+                System.IO.File.WriteAllText(OutputPath, report);
+                Console.WriteLine($"Report successfully saved to {OutputPath}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to save report to {OutputPath}", ex);
+            }
         }
 
         public virtual void Dispose()
