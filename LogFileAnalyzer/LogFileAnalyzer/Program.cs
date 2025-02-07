@@ -10,7 +10,7 @@ namespace LogFileAnalyzer
             LogAnalyzerUI ui = new LogAnalyzerUI();
             
             Console.WriteLine("Welcome to Log File Analyzer.");
-            Console.WriteLine("Commands: 'analyze' to start analysis, 'show' to display results, 'exit' to quit.");
+            Console.WriteLine("Commands: 'setup' to configure analysis, 'analyze' to start analysis, 'show' to display results, 'exit' to quit.");
 
             string command = "";
             do
@@ -22,6 +22,9 @@ namespace LogFileAnalyzer
 
                     switch (command)
                     {
+                        case "setup":
+                            ui.GetUserInput();
+                            break;
                         case "analyze":
                             ui.StartAnalysis();
                             break;
@@ -32,7 +35,7 @@ namespace LogFileAnalyzer
                             Console.WriteLine("Exiting application.");
                             break;
                         default:
-                            Console.WriteLine("Invalid option. The only commands are 'analyze', 'show' or 'exit'.");
+                            Console.WriteLine("Invalid option. The only commands are 'setup', 'analyze', 'show' or 'exit'.");
                             break;
                     }
                 }

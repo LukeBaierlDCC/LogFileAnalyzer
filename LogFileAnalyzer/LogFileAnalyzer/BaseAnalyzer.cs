@@ -25,6 +25,15 @@ namespace LogFileAnalyzer
         public LogLevel LogLevel { get; set; } = LogLevel.Info;
         public DateTime LastAnalysisTime { get; private set; }
 
+        protected DateTime? FromTime { get; set; }
+        protected DateTime? ToTime { get; set; }
+
+        public void SetTimeRange(DateTime from, DateTime to)
+        {
+            FromTime = from;
+            ToTime = to;
+        }
+
         //public string LogPath { get; set; } //sets the property from outside the class (allows for the property to be both read and set from outside the class,
         //might not be the best approach if working with encapsulation -- saving this for later in case I prefer this approach
         public BaseAnalyzer() : this(string.Empty) { }
@@ -106,6 +115,29 @@ namespace LogFileAnalyzer
             };
         }
 
+        public void ApplyDynamicFilter(string filterCriteria)
+        {
+            string[] parts = filterCriteria.Split('=');
+            if (parts.Length != 2) return;
+
+            string propertyName = parts[0].Trim();
+            string value = parts[1].Trim();
+
+            switch (propertyName.ToLower())
+            {
+                case "level":
+                    if (Enum.TryParse<LogLevel>(value, true, out LogLevel level))
+                    {
+                        this.LogLevel = level;
+                    }
+                    break;
+
+                default:
+                    Console.WriteLine($"Filter by '{propertyName}' not implemented.");
+                    break;
+            }
+        }
+
         public virtual void FilterLogs(List<LogEntry> logs)
         {
             //filters logs based on criteria
@@ -114,8 +146,14 @@ namespace LogFileAnalyzer
                 throw new ArgumentException("Log collection cannot be null or empty", nameof(logs));
             }
 
-            logs = logs.Where(log =>
-                Enum.Parse<LogLevel>(log.Level) >= this.LogLevel).ToList();
+            //logs = logs.Where(log =>
+            //    Enum.Parse<LogLevel>(log.Level) >= this.LogLevel).ToList();
+
+            var filteredLogs = logs.Where(log =>
+            Enum.Parse<LogLevel>(log.Level) >= this.LogLevel &&
+            (!FromTime.HasValue || log.Timestamp >= FromTime.Value) &&
+            (!ToTime.HasValue || log.Timestamp <= ToTime.Value)
+            ).ToList();
 
             this.SpecificFilterLogs(logs);
         }
