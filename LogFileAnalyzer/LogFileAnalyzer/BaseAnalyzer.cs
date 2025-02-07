@@ -32,7 +32,9 @@ namespace LogFileAnalyzer
         {
             LogPath = logPath;
             Config = new Dictionary<string, string>();
-        }               
+        }
+
+        protected List<LogEntry> logs = new List<LogEntry>();
 
         public virtual void ReadLogs()
         {
@@ -50,13 +52,17 @@ namespace LogFileAnalyzer
                     while ((line = sr.ReadLine()) != null)
                     {
                         LogEntry logEntry = this.ParseLogLine(line);
+                        if (logEntry != null)
+                        {
+                            logs.Add(logEntry);
+                        }
                     }
                 }
             }
             catch (IOException ex)
             {
                 throw new Exception("Error reading log file", ex);
-            }
+            }            
         }
 
         protected virtual LogEntry ParseLogLine(string line)
@@ -99,16 +105,41 @@ namespace LogFileAnalyzer
             };
         }
 
-        public virtual void FilterLogs()
+        public virtual void FilterLogs(List<LogEntry> logs)
         {
             //filters logs based on criteria
+            if (logs == null || logs.Count == 0)
+            {
+                throw new ArgumentException("Log collection cannot be null or empty", nameof(logs));
+            }
 
+            logs = logs.Where(log =>
+                Enum.Parse<LogLevel>(log.Level) >= this.LogLevel).ToList();
+
+            this.SpecificFilterLogs(logs);
         }
 
-        public virtual void ProcessLogs()
+        protected virtual void SpecificFilterLogs(List<LogEntry> logs)
+        {
+            //
+        }
+
+        public virtual void ProcessLogs(List<LogEntry> logs)
         {
             //processes the logs when applicable
+            if (logs == null || logs.Count == 0)
+            {
+                throw new ArgumentException("Log collection cannot be null or empty", nameof(logs));
+            }
 
+            var logLevelCounts = logs.GroupBy(log => log.Level).ToDictionary(g => g.Key, g => g.Count());
+
+            this.SpecificProcessLogs(logs);
+        }
+
+        protected virtual void SpecificProcessLogs(List<LogEntry> logs)
+        {
+            //override in derived classes for custom processing logic
         }
 
         public virtual string GenerateReport()
@@ -140,10 +171,13 @@ namespace LogFileAnalyzer
         {
             //entry point for analysis, allows derived classes to override with specific analysis logic
             try
-            {
+            {               
                 this.ReadLogs();
-                this.FilterLogs();
-                this.ProcessLogs();
+
+                List<LogEntry> logs = this.GetLogs();
+
+                this.FilterLogs(logs);
+                this.ProcessLogs(logs);
                 string report = this.GenerateReport();
                 this.SaveReport(report);
             }
@@ -156,6 +190,11 @@ namespace LogFileAnalyzer
                 this.Dispose();
             }
 
+        }
+
+        protected List<LogEntry> GetLogs()
+        {
+            return this.logs;
         }
 
         protected virtual void SpecificAnalysis()
